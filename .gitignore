@@ -1,129 +1,75 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
+from scipy.optimize import minimize
+import matplotlib.pyplot as plt
+import numpy as np 
+from matplotlib import cm
+from mpl_toolkits.mplot3d import Axes3D
 
-# C extensions
-*.so
 
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-pip-wheel-metadata/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+def objective(x):                           # 3D (x,y,z)
+    return (x[0]**2/x[1])+x[1]+6            # z= x^2/y+y+6  
 
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
+def constraint1(x):
+    return x[0]*x[1]+4.0                   # >=0  print('constraint1=',constraint1(xS))=15.57   k=xS[0]*xS[1]+4=15.57  eh >=0
 
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
+def constraint2(x):                        # = 0 ou  135-x^2-y^2=0 que deu -2.876731741707772e-09
+    sum_sq= 135.0            
+    for i in range(2):
+        sum_sq=sum_sq-x[i]**2             # nem sempre contraint2(xS) da zero ou quase 0.E aí?
+    return sum_sq                         # print('constraint2=',constraint2(xS))= -2.876731741707772e-09 eh isso: l=2-(n=2-xS[0]**2-xS[1]**2)**2-(xS[1])**2=-119.80
+    
+x0=[11.5,0.1]                             # colocar um ponto dentro do intervalo bx e by
 
-# Translations
-*.mo
-*.pot
+bx=(11,12)                                # limite para x --> x1S = 11.0
+by=(0,1)                                  # limite para y --> x2S = 0.89
+bnds=(bx,by)                           
+con1={'type':'ineq','fun':constraint1}  
+con2={'type':'eq','fun':constraint2}
+cons = [con1,con2]
 
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
+sol = minimize(objective,x0,method='SLSQP',\
+                    bounds=bnds,constraints=cons)    # um monte de resposta, so precisa de x.sol
+xS = sol.x                                           #veja que todos os números sairam entre 1.5 e 10
 
-# Flask stuff:
-instance/
-.webassets-cache
+print('Solution')
+print('x1S = ' + str(xS[0]))
+print('x2S = ' + str(xS[1]))
 
-# Scrapy stuff:
-.scrapy
+# caixinha de intervalo
+fig = plt.figure()
+ax = plt.axes(projection='3d')
 
-# Sphinx documentation
-docs/_build/
+X = np.arange(2,20,0.1)          # o ultimo numero e o intervalo. O default eh 1.        
+Y = np.arange(0.1,1.1,0.1)               
+X, Y = np.meshgrid(X, Y)         # faz a combinação do arange. Aqui X e Y sao diferentes do anterior
+Z = (X**2/Y)+Y+6                 # z= x^2/y+y+6   
 
-# PyBuilder
-target/
+ax.plot_surface(X, Y, Z, cmap=cm.coolwarm,
+                      linewidth=0, antialiased=False)
+# ax.plot_wireframe(X, Y, Z)
 
-# Jupyter Notebook
-.ipynb_checkpoints
 
-# IPython
-profile_default/
-ipython_config.py
+ax.scatter(xS[0],xS[1],objective(xS), c='k', marker='*', linewidth=6)
+ax.scatter(x0[0],x0[1],objective(x0), c='k', marker='*', linewidth=6)
+ax.set_xlabel('X-axis')
+ax.set_ylabel('Y-axis')
+ax.set_zlabel('Z-axis')
+ax.text(x0[0],x0[1],objective(x0),"Guess",color='red',fontsize=14)
+ax.text(xS[0],xS[1],objective(xS),"Solution",color='red',fontsize=14) 
 
-# pyenv
-.python-version
+plt.show()
 
-# pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if having platform-specific dependencies or dependencies
-#   having no cross-platform support, pipenv may install dependencies that don't work, or not
-#   install all needed dependencies.
-#Pipfile.lock
+# Test
+print(xS[0],xS[1])
+print('constraint1=',constraint1(xS)) # deveria ser >=0
+print('constraint2=',constraint2(xS)) # deveria dar 0
 
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow
-__pypackages__/
-
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
-
-# SageMath parsed files
-*.sage.py
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre type checker
-.pyre/
+if xS[0] >= bx[0] and xS[0]<= bx[1]:
+    print ('bxi=',bx[0],'xS[0]=',np.round(xS[0],2),'bxf=',bx[1],"True")
+    
+if xS[1] >= by[0] and xS[1]<= by[1]:
+    print ('byi=',by[0],'xS[1]=',np.round(xS[1],2),'byf=',by[1],"True")
+    
+# Check again
+res = minimize(objective, x0, method='SLSQP', tol=1e-6,bounds=bnds,constraints=cons)
+print(res.success)
