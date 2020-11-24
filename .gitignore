@@ -5,31 +5,32 @@ from matplotlib import cm
 from mpl_toolkits.mplot3d import Axes3D
 
 
-def objective(x):                           # 3D (x,y,z)
-    return (x[0]**2/x[1])+x[1]+6            # z= x^2/y+y+6  
+def objective(x):                           
+    return (x[0]**2/x[1])+x[1]+6            
 
 
 def constraint1(x):
-    return x[0]*x[1]+4.0                   # >=0  print('constraint1=',constraint1(xS))=15.57   k=xS[0]*xS[1]+4=15.57  eh >=0
+    return x[0]*x[1]+4.0                   
 
-def constraint2(x):                        # = 0 ou  135-x^2-y^2=0 que deu -2.876731741707772e-09
+def constraint2(x):                        
     sum_sq= 135.0            
     for i in range(2):
-        sum_sq=sum_sq-x[i]**2             # nem sempre contraint2(xS) da zero ou quase 0.E aí?
-    return sum_sq                         # print('constraint2=',constraint2(xS))= -2.876731741707772e-09 eh isso: l=2-(n=2-xS[0]**2-xS[1]**2)**2-(xS[1])**2=-119.80
-    
-x0=[11.5,0.1]                             # colocar um ponto dentro do intervalo bx e by
+        sum_sq=sum_sq-x[i]**2             
+    return sum_sq                         
+                                          
 
-bx=(11,12)                                # limite para x --> x1S = 11.0
-by=(0,1)                                  # limite para y --> x2S = 0.89
-bnds=(bx,by)                           
-con1={'type':'ineq','fun':constraint1}  
+x0=[11.5,0.1]                             
+
+bx=(11,12)                                
+by=(0,1)                                  
+bnds=(bx,by)                         
+con1={'type':'ineq','fun':constraint1}    
 con2={'type':'eq','fun':constraint2}
 cons = [con1,con2]
 
 sol = minimize(objective,x0,method='SLSQP',\
-                    bounds=bnds,constraints=cons)    # um monte de resposta, so precisa de x.sol
-xS = sol.x                                           #veja que todos os números sairam entre 1.5 e 10
+                    bounds=bnds,constraints=cons)    
+xS = sol.x                                           
 
 print('Solution')
 print('x1S = ' + str(xS[0]))
@@ -39,14 +40,13 @@ print('x2S = ' + str(xS[1]))
 fig = plt.figure()
 ax = plt.axes(projection='3d')
 
-X = np.arange(2,20,0.1)          # o ultimo numero e o intervalo. O default eh 1.        
+X = np.arange(2,20,0.1)                  
 Y = np.arange(0.1,1.1,0.1)               
-X, Y = np.meshgrid(X, Y)         # faz a combinação do arange. Aqui X e Y sao diferentes do anterior
-Z = (X**2/Y)+Y+6                 # z= x^2/y+y+6   
+X, Y = np.meshgrid(X, Y)         
+Z = (X**2/Y)+Y+6                 
 
 ax.plot_surface(X, Y, Z, cmap=cm.coolwarm,
                       linewidth=0, antialiased=False)
-# ax.plot_wireframe(X, Y, Z)
 
 
 ax.scatter(xS[0],xS[1],objective(xS), c='k', marker='*', linewidth=6)
@@ -59,10 +59,9 @@ ax.text(xS[0],xS[1],objective(xS),"Solution",color='red',fontsize=14)
 
 plt.show()
 
-# Test
-print(xS[0],xS[1])
-print('constraint1=',constraint1(xS)) # deveria ser >=0
-print('constraint2=',constraint2(xS)) # deveria dar 0
+print('xS[0]=',xS[0],'xS[1]=',xS[1])
+print('constraint1=',constraint1(xS)) 
+print('constraint2=',constraint2(xS)) 
 
 if xS[0] >= bx[0] and xS[0]<= bx[1]:
     print ('bxi=',bx[0],'xS[0]=',np.round(xS[0],2),'bxf=',bx[1],"True")
@@ -70,6 +69,6 @@ if xS[0] >= bx[0] and xS[0]<= bx[1]:
 if xS[1] >= by[0] and xS[1]<= by[1]:
     print ('byi=',by[0],'xS[1]=',np.round(xS[1],2),'byf=',by[1],"True")
     
-# Check again
 res = minimize(objective, x0, method='SLSQP', tol=1e-6,bounds=bnds,constraints=cons)
 print(res.success)
+
