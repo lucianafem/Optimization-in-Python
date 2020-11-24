@@ -4,7 +4,6 @@ import numpy as np
 from matplotlib import cm
 from mpl_toolkits.mplot3d import Axes3D
 
-
 def objective(x):                           
     return (x[0]**2/x[1])+x[1]+6            
 
@@ -57,7 +56,20 @@ ax.set_zlabel('Z-axis')
 ax.text(x0[0],x0[1],objective(x0),"Guess",color='red',fontsize=14)
 ax.text(xS[0],xS[1],objective(xS),"Solution",color='red',fontsize=14) 
 
+
+fig = plt.figure()
+ax1 = plt.axes(projection='3d')
+ax1.plot_wireframe(X, Y, Z, rstride=10, cstride=10)
+ax1.scatter(xS[0],xS[1],objective(xS), c='k', marker='*', linewidth=6)
+ax1.scatter(x0[0],x0[1],objective(x0), c='k', marker='*', linewidth=6)
+ax1.set_xlabel('X-axis')
+ax1.set_ylabel('Y-axis')
+ax1.set_zlabel('Z-axis')
+ax1.text(x0[0],x0[1],objective(x0),"Guess",color='red',fontsize=14)
+ax1.text(xS[0],xS[1],objective(xS),"Solution",color='red',fontsize=14) 
+
 plt.show()
+
 
 print('xS[0]=',xS[0],'xS[1]=',xS[1])
 print('constraint1=',constraint1(xS)) 
