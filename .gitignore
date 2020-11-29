@@ -47,7 +47,6 @@ Z = (X**2/Y)+Y+6
 ax.plot_surface(X, Y, Z, cmap=cm.coolwarm,
                       linewidth=0, antialiased=False)
 
-
 ax.scatter(xS[0],xS[1],objective(xS), c='k', marker='*', linewidth=6)
 ax.scatter(x0[0],x0[1],objective(x0), c='k', marker='*', linewidth=6)
 ax.set_xlabel('X-axis')
@@ -55,7 +54,6 @@ ax.set_ylabel('Y-axis')
 ax.set_zlabel('Z-axis')
 ax.text(x0[0],x0[1],objective(x0),"Guess",color='red',fontsize=14)
 ax.text(xS[0],xS[1],objective(xS),"Solution",color='red',fontsize=14) 
-
 
 fig = plt.figure()
 ax1 = plt.axes(projection='3d')
@@ -70,7 +68,6 @@ ax1.text(xS[0],xS[1],objective(xS),"Solution",color='red',fontsize=14)
 
 plt.show()
 
-
 print('xS[0]=',xS[0],'xS[1]=',xS[1])
 print('constraint1=',constraint1(xS)) 
 print('constraint2=',constraint2(xS)) 
@@ -83,4 +80,3 @@ if xS[1] >= by[0] and xS[1]<= by[1]:
     
 res = minimize(objective, x0, method='SLSQP', tol=1e-6,bounds=bnds,constraints=cons)
 print(res.success)
-
